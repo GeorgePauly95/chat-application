@@ -54,3 +54,21 @@ Table session {
   createdAt timestamp
   deletedAt timestamp
 }
+
+Ref: "user"."id" < "message"."senderId"
+
+Ref: "group"."id" < "message"."groupId"
+
+Ref: "message"."repliedTo" > "message"."id"
+
+Ref: "user"."id" < "user_account"."userId"
+
+Ref: "user"."id" < "session"."userId"
+
+Ref: "user"."id" < "group_member"."userId"
+
+Ref: "group"."id" < "group_member"."groupId"
+
+Ref: "message_status"."userId" < "user"."id"
+
+Ref: "message_status"."messageId" - "message"."id"
