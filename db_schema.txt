@@ -1,0 +1,56 @@
+Table message {
+  id uuid [primary key]
+  senderId integer
+  groupId integer
+  content text
+  sentAt timestamp
+  deletedAt timestamp
+  repliedTo uuid
+}
+
+Table message_status {
+  id uuid [primary key]
+  messageId uuid
+  userId integer
+  readAt timestamp
+}
+
+Table user {
+  id integer [primary key]
+  name varchar
+  createdAt timestamp
+  deletedAt timestamp
+}
+
+Table user_account {
+  id integer [primary key]
+  accountType varchar
+  userId integer
+  username varchar
+  password text
+}
+
+Table group {
+  id integer [primary key]
+  name varchar
+  createdAt timestamp
+  deletedAt timestamp
+}
+
+Table group_member {
+  id integer [primary key]
+  userId integer
+  groupId integer
+  role enum
+  joinedAt timestamp
+  leftAt timestamp
+}
+
+Table session {
+  id uuid [primary key]
+  userId integer
+  token text
+  expiresAt timestamp
+  createdAt timestamp
+  deletedAt timestamp
+}
