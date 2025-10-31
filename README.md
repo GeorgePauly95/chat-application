@@ -1,11 +1,8 @@
-1. GET/user
-2. POST/user
-3. PATCH/user
-4. GET/message
-5. POST/message
-6. PATCH/message
-7. GET/group
-8. POST/group
-9. GET/group/member
-10. POST/group/member
-11. PATCH/group/member
+# Chat Application
+
+## Description:
+
+A simple WhatsApp clone.
+Frontend built with React and the backend with FastAPI and PostgreSQL.
+
+
