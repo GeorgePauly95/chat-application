@@ -1,0 +1,28 @@
+.convobox {
+  background-color: cornflowerblue;
+  width: 500px;
+  padding: 10px;
+  border-color: black;
+
+}
+
+.name {
+  margin-left: 50px;
+}
+
+.lastmsgtime {
+  margin-left: 200px;
+}
+
+.lower {
+  padding-top: 10px
+}
+
+.readstatus {
+  margin-left: 100px;
+}
+
+
+.lastmsg {
+  margin-left: 100px;
+}
