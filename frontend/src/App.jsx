@@ -1,39 +1,46 @@
-import { StrictMode, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
+
 function App() {
 
   return (
-    <div>
-      <MyConversation />
-      <MyConversation />
-      <MyConversation />
-      <MyConversation />
-      <MyConversation />
-      <MyConversation />
-      <MyConversation />
-      <MyConversation />
+    <div className="box">
+      <TextInput />
     </div>
   )
 }
 
-function MyConversation() {
+function TextInput() {
+  const [message, setMessage] = useState("")
+  const [msghst, setMsghst] = useState([])
+  function sentMessage(e) {
+    setMessage(e.get("currmsg"))
+    msghst.push(message)
+    setMsghst(msghst)
+  }
   return (
-    <div className="convobox">
-      <span> <img src="" alt="image" /></span>
-      <span className="name">George Pauly</span>
-      <span className="lastmsgtime">09:00 AM</span>
-      <div className='lower'>
-        <span className='readstatus'> Read </span>
-        <span className='lastmsg'>
-          Good Morning!
-        </span>
-      </div>
-    </div >
+    <div>
+      <form action={sentMessage}>
+        <label>
+          <input name="currmsg" type="text" className="currmsg" placeholder="enter message here" />
+        </label>
+        <button type="submit" className="sendbtn">Send</button>
+      </form>
+      {<MessageHistory msghst={msghst} />}
+      {message && <MessageBlob message={message} />}
+    </div>
   )
-
 }
 
-function ReadStatus() {
-
+function MessageHistory({ msghst }) {
+  return (<div>
+    {msghst.map(message => <div>{message}</div>)}
+  </div>)
 }
+
+function MessageBlob({ message }) {
+  return (<div className='blob'>{message}</div>)
+}
+
+
 export default App

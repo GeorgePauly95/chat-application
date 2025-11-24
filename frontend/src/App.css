@@ -1,28 +1,30 @@
-.convobox {
+body {
+  margin: 0;
+}
+
+.box {
   background-color: cornflowerblue;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow: auto;
+  padding-bottom: 42px;
+}
+
+.currmsg {
+  position: fixed;
+  bottom: 1px;
   width: 500px;
-  padding: 10px;
-  border-color: black;
-
 }
 
-.name {
-  margin-left: 50px;
+.sendbtn {
+
+  position: fixed;
+  bottom: 1px;
+  left: 520px;
 }
 
-.lastmsgtime {
-  margin-left: 200px;
-}
-
-.lower {
-  padding-top: 10px
-}
-
-.readstatus {
-  margin-left: 100px;
-}
-
-
-.lastmsg {
-  margin-left: 100px;
+.blob {
+  border-radius: 20px;
+  border-color: white;
+  background-color: white;
 }
