@@ -47,8 +47,8 @@
 
 
 ### Success Response:
-### Status: 200 OK
-### Body:
+#### Status: 200 OK
+#### Body:
 
 ```JSON
   [
@@ -79,8 +79,8 @@
 ### Description: Send a message in the group.
 
 ### Request
-### Endpoint: POST/messages
-### Body: 
+#### Endpoint: POST/messages
+#### Body: 
 
 ```JSON
 {
@@ -91,12 +91,10 @@
   repliedTo: None,
 }
 ```
-```
-```
 
 ### Success Response
-### Status: 201 Created
-### Body:
+#### Status: 201 Created
+#### Body:
 
 ```JSON
 {
