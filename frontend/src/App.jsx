@@ -17,12 +17,7 @@ function TextInput() {
   useEffect(() => {
     fetch("/api/messages").then(response => response.json())
       .then(data => {
-        const n = data.length;
-        let messages = [];
-        for (let i = 0; i < n; i++) {
-          messages.push(data[i]["messageContent"])
-        };
-        setMsghst(messages)
+        setMsghst(data)
       })
   }, [])
 
@@ -31,7 +26,7 @@ function TextInput() {
       method: "POST",
       body: JSON.stringify({
         "senderName": "George",
-        "messageContent": message,
+        "messageContent": message["messageContent"],
         "sentAt": "12-12-2024",
         "readStatus": true,
         "repliedTo": null,
@@ -44,7 +39,13 @@ function TextInput() {
     [message])
 
   function sentMessage(e) {
-    setMessage(e.get("currmsg"))
+    setMessage({
+      "senderName": "George",
+      "messageContent": e.get("currmsg"),
+      "sentAt": "12-12-2025",
+      "readStatus": true,
+      "repliedTo": null,
+    })
     setMsghst([...msgHst, message])
   }
 
@@ -55,20 +56,18 @@ function TextInput() {
         <button type="submit" className="sendbtn">Send</button>
       </form>
       {<MessageHistory msgHst={msgHst} />}
-      {message && <MessageBlob message={message} />}
+      {message && <MessageBlob message={message["messageContent"]} />}
     </div>
   )
 }
 
 function MessageHistory({ msgHst }) {
   return (<div>
-    {msgHst.map(message => <MessageBlob message={message} />)}
+    {msgHst.map(message => <MessageBlob message={message["messageContent"]} />)}
   </div>)
 }
 
 function MessageBlob({ message }) {
-
-
   return (
     <div className='blob'>{message}</div>
   )
