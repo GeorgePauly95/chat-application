@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
 app = FastAPI()
 
@@ -8,6 +8,33 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.get("/users/{user_id}")
-async def show_user_details(user_id: int):
-    return {"user_id": user_id * 10}
+messages = [
+    {
+        "messageId": 1,
+        "senderName": "George",
+        "messageContent": "Hey",
+        "sentAt": "12-12-2024",
+        "readStatus": True,
+        "repliedTo": None,
+    },
+    {
+        "messageId": 2,
+        "senderName": "George",
+        "messageContent": "What's up",
+        "sentAt": "12-12-2024",
+        "readStatus": True,
+        "repliedTo": None,
+    },
+]
+
+
+@app.get("/api/messages")
+async def show_messages():
+    return messages
+
+
+@app.post("/api/messages")
+async def send_message(request: Request):
+    json_body = await request.json()
+    messages.append(json_body)
+    return "message stored!"
