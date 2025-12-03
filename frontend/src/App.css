@@ -50,7 +50,7 @@ body {
 }
 
 .currmsg {
-  width: calc(100% - 75px);
+  flex-grow: 1;
 }
 
 .sendbtn {
