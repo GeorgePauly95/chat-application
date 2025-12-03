@@ -1,0 +1,16 @@
+.box_conv {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  background-color: darkolivegreen;
+  border-style: solid;
+  border-color: thistle;
+  border-radius: 7.5px;
+}
+
+.conv {
+  background-color: darkgreen;
+  border-style: solid;
+  border-color: whitesmoke;
+  border-radius: 5px;
+}

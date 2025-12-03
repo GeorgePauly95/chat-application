@@ -1,6 +1,5 @@
 body {
   margin: 0px;
-  ;
 }
 
 
@@ -8,21 +7,6 @@ body {
   display: flex;
   flex-direction: row;
   background-color: seagreen;
-}
-
-.box_conv {
-  display: flex;
-  flex-direction: column;
-  width: 200px;
-  background-color: darkolivegreen;
-  border-style: solid;
-  border-color: thistle;
-}
-
-.conv {
-  background-color: darkgreen;
-  border-style: solid;
-  border-color: whitesmoke;
 }
 
 .box_inner {
