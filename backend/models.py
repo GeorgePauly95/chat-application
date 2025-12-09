@@ -17,17 +17,17 @@ class GroupMemberRole(enum.Enum):
 
 
 class Message(Base):
-    __tablename__ = "message"
+    __tablename__ = "messages"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
-    senderId: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    groupId: Mapped[int] = mapped_column(ForeignKey("group.id"))
+    sender_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    group_id: Mapped[int] = mapped_column(ForeignKey("group_chats.id"))
     content: Mapped[str] = mapped_column(Text)
-    sentAt: Mapped[datetime] = mapped_column(TIMESTAMP)
-    deletedAt: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
-    repliedTo: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("message.id"))
+    sent_at: Mapped[datetime] = mapped_column(TIMESTAMP)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
+    replied_to: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("messages.id"))
 
 
 class MessageStatus(Base):
@@ -36,60 +36,60 @@ class MessageStatus(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
-    messageId: Mapped[uuid.UUID] = mapped_column(ForeignKey("message.id"))
-    userId: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    readAt: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
+    message_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("messages.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    read_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
 
 
 class UserAccount(Base):
-    __tablename__ = "user_account"
+    __tablename__ = "user_accounts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    accountType: Mapped[str] = mapped_column(String(25))
-    userId: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    account_type: Mapped[str] = mapped_column(String(25))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     username: Mapped[str] = mapped_column(String(25))
     password: Mapped[str] = mapped_column(Text)
 
 
 class Group(Base):
-    __tablename__ = "group"
+    __tablename__ = "group_chats"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50))
-    createdAt: Mapped[datetime] = mapped_column(TIMESTAMP)
-    deletedAt: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
 
 
 class GroupMember(Base):
-    __tablename__ = "group_member"
+    __tablename__ = "group_members"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    userId: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    groupId: Mapped[int] = mapped_column(ForeignKey("group.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    group_id: Mapped[int] = mapped_column(ForeignKey("group_chats.id"))
     role: Mapped[GroupMemberRole] = mapped_column(
         SQLEnum(GroupMemberRole, name="groupmemberrole")
     )
-    joinedAt: Mapped[datetime] = mapped_column(TIMESTAMP)
-    leftAt: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
+    joined_at: Mapped[datetime] = mapped_column(TIMESTAMP)
+    left_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
 
 
 class Session(Base):
-    __tablename__ = "session"
+    __tablename__ = "sessions"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
-    userId: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     token: Mapped[str] = mapped_column(Text)
-    expiresAt: Mapped[datetime] = mapped_column(TIMESTAMP)
-    createdAt: Mapped[datetime] = mapped_column(TIMESTAMP)
-    deletedAt: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
+    expires_at: Mapped[datetime] = mapped_column(TIMESTAMP)
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
 
 
 class User(Base):
-    __tablename__ = "user"
+    __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50))
-    createdAt: Mapped[datetime] = mapped_column(TIMESTAMP)
-    deletedAt: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
