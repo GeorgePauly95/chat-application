@@ -23,21 +23,26 @@ function TextInput() {
   }, [])
 
   function sendMessage(e) {
+    var uuid = crypto.randomUUID()
     setMsghst([...msgHst, {
-      "senderName": "George",
-      "messageContent": e.get("currmsg"),
-      "sentAt": "12-12-2025",
-      "readStatus": true,
-      "repliedTo": null,
+      "id": uuid,
+      "sender_id": 1,
+      "group_id": 1,
+      "content": e.get("currmsg"),
+      "sent_at": "12-12-2025",
+      "deleted_at": null,
+      "replied_to": null,
     }])
     fetch("/api/messages", {
       method: "POST",
       body: JSON.stringify({
-        "senderName": "George",
-        "messageContent": e.get("currmsg"),
-        "sentAt": "12-12-2024",
-        "readStatus": true,
-        "repliedTo": null,
+        "id": uuid,
+        "sender_id": 1,
+        "group_id": 1,
+        "content": e.get("currmsg"),
+        "sent_at": "12-12-2024",
+        "deleted_at": null,
+        "replied_to": null,
       })
     })
       .then(response => response.json())
@@ -51,6 +56,7 @@ function TextInput() {
         {<MessageHistory msgHst={msgHst} />}
       </div>
       <form action={sendMessage} className='form'>
+        {/* onKeyUp={}  */}
         <textarea name="currmsg" type="text" className="currmsg" placeholder="enter message here" />
         <button type="submit" className="sendbtn">Send</button>
       </form>
@@ -60,7 +66,7 @@ function TextInput() {
 
 function MessageHistory({ msgHst }) {
   return (<div className='msgHst'>
-    {msgHst.map(message => <MessageBlob message={message["messageContent"]} />)}
+    {msgHst.map(message => <MessageBlob message={message["content"]} />)}
   </div>)
 }
 
