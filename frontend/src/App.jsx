@@ -11,9 +11,10 @@ function App() {
   )
 }
 
+const userId = 2
 
 function TextInput() {
-  const [msgHst, setMsghst] = useState([{ "messageContent": "" }])
+  const [msgHst, setMsghst] = useState([{ "content": "" }])
 
   useEffect(() => {
     fetch("/api/messages").then(response => response.json())
@@ -23,38 +24,35 @@ function TextInput() {
   }, [])
 
   function sendMessage(e) {
-    var uuid = crypto.randomUUID()
-    setMsghst([...msgHst, {
-      "id": uuid,
-      "sender_id": 1,
-      "group_id": 1,
-      "content": e.get("currmsg"),
-      "sent_at": "12-12-2025",
-      "deleted_at": null,
-      "replied_to": null,
-    }])
+
     fetch("/api/messages", {
       method: "POST",
       body: JSON.stringify({
-        "id": uuid,
-        "sender_id": 1,
+        "sender_id": 2,
         "group_id": 1,
         "content": e.get("currmsg"),
-        "sent_at": "12-12-2024",
-        "deleted_at": null,
-        "replied_to": null,
       })
     })
-      .then(response => response.json())
+      .then(response => {
+        if (response.ok) {
+          setMsghst([...msgHst, {
+            "sender_id": 2,
+            "group_id": 1,
+            "content": e.get("currmsg"),
+          }])
+          return response.json()
+        }
+        return "Message Failed"
+      })
       .then(data => console.log(data))
+
 
   }
 
+
   return (
     <div className='box_inner'>
-      <div className='box_messages'>
-        {<MessageHistory msgHst={msgHst} />}
-      </div>
+      {<MessageHistory msgHst={msgHst} />}
       <form action={sendMessage} className='form'>
         {/* onKeyUp={}  */}
         <textarea name="currmsg" type="text" className="currmsg" placeholder="enter message here" />
@@ -72,7 +70,7 @@ function MessageHistory({ msgHst }) {
 
 function MessageBlob({ message }) {
   return (
-    <div className='msg'>{message}</div>
+    <div className={userId != message.sender_id ? 'msgl' : 'msgr'}>{message}</div>
   )
 }
 
