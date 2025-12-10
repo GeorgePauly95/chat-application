@@ -1,5 +1,5 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import String, Text, Integer, Enum as SQLEnum, ForeignKey
+from sqlalchemy import text, String, Text, Integer, Enum as SQLEnum, ForeignKey, func
 from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
 from typing import Optional
 from datetime import datetime
@@ -20,14 +20,42 @@ class Message(Base):
     __tablename__ = "messages"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        server_default=text("gen_random_uuid()"),
     )
     sender_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     group_id: Mapped[int] = mapped_column(ForeignKey("group_chats.id"))
     content: Mapped[str] = mapped_column(Text)
-    sent_at: Mapped[datetime] = mapped_column(TIMESTAMP)
+    sent_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=text("NOW()"))
     deleted_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
     replied_to: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("messages.id"))
+
+    @classmethod
+    def showall_messages(cls, connection):
+        messages = connection.execute(text("SELECT * FROM messages"))
+        mapped_messages = [message._mapping for message in messages.all()]
+        return mapped_messages
+
+    @classmethod
+    def add_message(cls, request_body, connection):
+        message = connection.execute(
+            text(
+                """INSERT INTO messages
+        (sender_id, group_id, content) VALUES 
+        (:sender_id, :group_id, :content) RETURNING *"""
+            ),
+            {
+                "sender_id": request_body["sender_id"],
+                "group_id": request_body["group_id"],
+                "content": request_body["content"],
+            },
+        )
+        sent_message = message.first()
+        mapped_message = sent_message._mapping
+        connection.commit()
+        return mapped_message
 
 
 class MessageStatus(Base):
@@ -58,6 +86,12 @@ class Group(Base):
     name: Mapped[str] = mapped_column(String(50))
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
+
+    @classmethod
+    def showall_groups(cls, connection):
+        messages = connection.execute(text("SELECT * FROM group_chats"))
+        mapped_groups = [message._mapping for message in messages.all()]
+        return mapped_groups
 
 
 class GroupMember(Base):
