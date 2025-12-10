@@ -7,7 +7,9 @@ body {
   display: flex;
   flex-direction: row;
   background-color: seagreen;
+  height: 100vh;
 }
+
 
 .box_inner {
   display: flex;
@@ -15,38 +17,39 @@ body {
   width: calc(100% - 200px);
 }
 
-.box_messages {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  height: 100vh;
-  width: 100%;
-
-}
 
 .msgHst {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: flex-start;
   row-gap: 20px;
   overflow: auto;
-  margin-left: 10px;
+  padding-left: 10px;
+  padding-bottom: 10px;
 }
 
-.msg {
+.msgl {
   background-color: whitesmoke;
+  align-self: flex-start;
   border-radius: 5px;
   padding: 5px;
 }
 
+.msgr {
+  background-color: whitesmoke;
+  align-self: flex-end;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+
 .form {
-  position: relative;
-  bottom: 1px;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  height: 50px;
+  height: 150px;
+  width: 100%;
 }
 
 .currmsg {
