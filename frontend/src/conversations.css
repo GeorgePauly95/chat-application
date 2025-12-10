@@ -3,9 +3,9 @@
   flex-direction: column;
   width: 200px;
   background-color: darkolivegreen;
-  border-style: solid;
-  border-color: thistle;
-  border-radius: 7.5px;
+  padding: 10px;
+  row-gap: 10px;
+  overflow: auto;
 }
 
 .conv {
@@ -13,4 +13,5 @@
   border-style: solid;
   border-color: whitesmoke;
   border-radius: 5px;
+  padding: 5px;
 }
