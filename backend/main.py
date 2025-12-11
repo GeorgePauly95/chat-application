@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
+from fastapi.responses import JSONResponse
 from engine import engine
 from models import Message, Group, UserAccount
-from services import check_user
+from services import get_user_details
 
 app = FastAPI()
 
@@ -11,10 +12,10 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.get("/api/messages")
-async def show_messages():
+@app.get("/api/messages/")
+async def show_messages(userid: int):
     connection = engine.connect()
-    return Message.showall_messages(connection)
+    return Message.showall_messages(userid, connection)
 
 
 @app.post("/api/messages")
@@ -35,4 +36,10 @@ async def login(request: Request):
     request_body = await request.json()
     connection = engine.connect()
     username = request_body["username"]
-    return check_user(username, UserAccount, connection)
+    user_details = get_user_details(username, UserAccount, connection)
+    if not user_details:
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"message": "Unauthorized"},
+        )
+    return user_details
