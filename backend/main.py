@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
-from sqlalchemy import text
 from engine import engine
-from models import Message, Group
+from models import Message, Group, UserAccount
+from services import check_user
 
 app = FastAPI()
 
@@ -28,3 +28,11 @@ async def send_message(request: Request):
 async def show_groups():
     connection = engine.connect()
     return Group.showall_groups(connection)
+
+
+@app.post("/api/login")
+async def login(request: Request):
+    request_body = await request.json()
+    connection = engine.connect()
+    username = request_body["username"]
+    return check_user(username, UserAccount, connection)
