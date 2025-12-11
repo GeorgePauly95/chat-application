@@ -78,6 +78,12 @@ class UserAccount(Base):
     username: Mapped[str] = mapped_column(String(25))
     password: Mapped[str] = mapped_column(Text)
 
+    @classmethod
+    def showall_users(cls, connection):
+        users = connection.execute(text("SELECT username FROM user_accounts"))
+        registered_users = users.all()
+        return registered_users
+
 
 class Group(Base):
     __tablename__ = "group_chats"
