@@ -1,7 +1,31 @@
 .box_form {
-  background-color: gray;
-  display: inline-block;
-  padding: 5px;
-  margin-top: 500px;
-  margin-left: 500px;
+  background-color: darkseagreen;
+  padding: 300px 600px;
+  height: 44vh;
+}
+
+.login_form {
+  background-color: forestgreen;
+  width: 500px;
+  padding: 80px 1px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 40px;
+  border-radius: 8px;
+}
+
+.box_input {
+  display: flex;
+  column-gap: 10px;
+}
+
+.user_detail {
+  color: whitesmoke;
+  font-weight: 600;
+
+}
+
+.submit_btn {
+  padding: 10px;
 }
