@@ -29,16 +29,9 @@ body {
   padding-bottom: 10px;
 }
 
-.msgl {
+.msg {
   background-color: whitesmoke;
   align-self: flex-start;
-  border-radius: 5px;
-  padding: 5px;
-}
-
-.msgr {
-  background-color: whitesmoke;
-  align-self: flex-end;
   border-radius: 5px;
   padding: 5px;
 }
