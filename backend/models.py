@@ -1,5 +1,5 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import text, String, Text, Integer, Enum as SQLEnum, ForeignKey, func
+from sqlalchemy import text, String, Text, Enum as SQLEnum, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
 from typing import Optional
 from datetime import datetime
@@ -33,8 +33,11 @@ class Message(Base):
     replied_to: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("messages.id"))
 
     @classmethod
-    def showall_messages(cls, connection):
-        messages = connection.execute(text("SELECT * FROM messages"))
+    def showall_messages(cls, user_id, connection):
+        messages = connection.execute(
+            text("SELECT * FROM messages WHERE sender_id=:user_id"),
+            {"user_id": user_id},
+        )
         mapped_messages = [message._mapping for message in messages.all()]
         return mapped_messages
 
@@ -79,10 +82,13 @@ class UserAccount(Base):
     password: Mapped[str] = mapped_column(Text)
 
     @classmethod
-    def showall_users(cls, connection):
-        users = connection.execute(text("SELECT username FROM user_accounts"))
-        registered_users = users.all()
-        return registered_users
+    def get_user_details(cls, username, connection):
+        user_accounts = connection.execute(
+            text("SELECT * FROM user_accounts WHERE username=:username"),
+            {"username": username},
+        )
+        user_accounts = user_accounts.first()
+        return user_accounts
 
 
 class Group(Base):
