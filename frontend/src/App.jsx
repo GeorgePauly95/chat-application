@@ -3,26 +3,24 @@ import Conversations from './conversations.jsx'
 import isEmptyMessage from './utils.js'
 import './App.css'
 
-function App() {
+function App({ user_id }) {
   return (
     <div className="box_outer">
-      <Conversations />
-      <TextInput />
+      <Conversations user_id={user_id} />
+      <TextInput user_id={user_id} />
     </div>
   )
 }
 
-const userId = 2
-
-function TextInput() {
+function TextInput({ user_id }) {
   const [msgHst, setMsghst] = useState([{ "content": "" }])
 
   useEffect(() => {
-    fetch("/api/messages").then(response => response.json())
+    fetch(`/api/messages/?userid=${user_id}`).then(response => response.json())
       .then(data => {
         setMsghst(data)
       })
-  }, [])
+  }, [user_id])
 
   function sendMessage(e) {
     var current_message = e.get("currmsg")
@@ -71,7 +69,7 @@ function MessageHistory({ msgHst }) {
 
 function MessageBlob({ message }) {
   return (
-    <div className={userId != message.sender_id ? 'msgl' : 'msgr'}>{message}</div>
+    <div className="msg">{message}</div>
   )
 }
 
