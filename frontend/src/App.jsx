@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import './App.css'
 import Conversations from './conversations.jsx'
+import isEmptyMessage from './utils.js'
+import './App.css'
 
 function App() {
   return (
@@ -24,13 +25,16 @@ function TextInput() {
   }, [])
 
   function sendMessage(e) {
-
+    var current_message = e.get("currmsg")
+    if (isEmptyMessage(current_message)) {
+      return
+    }
     fetch("/api/messages", {
       method: "POST",
       body: JSON.stringify({
         "sender_id": 2,
         "group_id": 1,
-        "content": e.get("currmsg"),
+        "content": current_message,
       })
     })
       .then(response => {
@@ -38,15 +42,13 @@ function TextInput() {
           setMsghst([...msgHst, {
             "sender_id": 2,
             "group_id": 1,
-            "content": e.get("currmsg"),
+            "content": current_message,
           }])
           return response.json()
         }
         return "Message Failed"
       })
       .then(data => console.log(data))
-
-
   }
 
 
@@ -54,7 +56,6 @@ function TextInput() {
     <div className='box_inner'>
       {<MessageHistory msgHst={msgHst} />}
       <form action={sendMessage} className='form'>
-        {/* onKeyUp={}  */}
         <textarea name="currmsg" type="text" className="currmsg" placeholder="enter message here" />
         <button type="submit" className="sendbtn">Send</button>
       </form>
