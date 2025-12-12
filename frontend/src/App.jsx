@@ -4,23 +4,24 @@ import isEmptyMessage from './utils.js'
 import './App.css'
 
 function App({ user_id }) {
+  const [group_id, setGroup_id] = useState(1)
   return (
     <div className="box_outer">
       <Conversations user_id={user_id} />
-      <TextInput user_id={user_id} />
+      <TextInput user_id={user_id} group_id={group_id} setGroup_id={setGroup_id} />
     </div>
   )
 }
 
-function TextInput({ user_id }) {
+function TextInput({ user_id, group_id, setGroup_id }) {
   const [msgHst, setMsghst] = useState([{ "content": "" }])
 
   useEffect(() => {
-    fetch(`/api/messages/?userid=${user_id}`).then(response => response.json())
+    fetch(`/api/messages/?groupid=${group_id}`).then(response => response.json())
       .then(data => {
         setMsghst(data)
       })
-  }, [user_id])
+  }, [group_id])
 
   function sendMessage(e) {
     var current_message = e.get("currmsg")
@@ -30,16 +31,16 @@ function TextInput({ user_id }) {
     fetch("/api/messages", {
       method: "POST",
       body: JSON.stringify({
-        "sender_id": 2,
-        "group_id": 1,
+        "sender_id": user_id,
+        "group_id": group_id,
         "content": current_message,
       })
     })
       .then(response => {
         if (response.ok) {
           setMsghst([...msgHst, {
-            "sender_id": 2,
-            "group_id": 1,
+            "sender_id": user_id,
+            "group_id": group_id,
             "content": current_message,
           }])
           return response.json()
@@ -52,7 +53,7 @@ function TextInput({ user_id }) {
 
   return (
     <div className='box_inner'>
-      {<MessageHistory msgHst={msgHst} />}
+      {<MessageHistory msgHst={msgHst} user_id={user_id} />}
       <form action={sendMessage} className='form'>
         <textarea name="currmsg" type="text" className="currmsg" placeholder="enter message here" />
         <button type="submit" className="sendbtn">Send</button>
@@ -61,15 +62,15 @@ function TextInput({ user_id }) {
   )
 }
 
-function MessageHistory({ msgHst }) {
+function MessageHistory({ msgHst, user_id }) {
   return (<div className='msgHst'>
-    {msgHst.map(message => <MessageBlob message={message["content"]} />)}
+    {msgHst.map(message => <MessageBlob message={message} user_id={user_id} />)}
   </div>)
 }
 
-function MessageBlob({ message }) {
+function MessageBlob({ message, user_id }) {
   return (
-    <div className="msg">{message}</div>
+    <div className={message["sender_id"] == user_id ? "msgr" : "msgl"}>{message["content"]}</div>
   )
 }
 
