@@ -25,17 +25,25 @@ body {
   align-items: flex-start;
   row-gap: 20px;
   overflow: auto;
-  padding-left: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
   padding-bottom: 10px;
 }
 
-.msg {
+.msgl {
   background-color: whitesmoke;
   align-self: flex-start;
   border-radius: 5px;
   padding: 5px;
 }
 
+
+.msgr {
+  background-color: whitesmoke;
+  align-self: flex-end;
+  border-radius: 5px;
+  padding: 5px;
+}
 
 .form {
   display: flex;
