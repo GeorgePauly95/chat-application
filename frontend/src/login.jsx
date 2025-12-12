@@ -4,17 +4,16 @@ import { useState } from 'react'
 
 
 function Start() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-
+  const [user_id, setUser_id] = useState(null)
   return (
     <div>
-      {isLoggedIn ? <App /> : <Login isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}
+      {user_id != null ? <App user_id={user_id} /> : <Login setUser_id={setUser_id} />}
     </div>
 
   )
 }
 
-function Login({ setIsLoggedIn }) {
+function Login({ setUser_id }) {
 
   function login(e) {
     var username = e.get("username")
@@ -23,25 +22,21 @@ function Login({ setIsLoggedIn }) {
       body: JSON.stringify({ username: username })
     })
       .then(response => response.json())
-      .then(data => {
-        if (data) {
-          setIsLoggedIn(true)
-        }
-      })
+      .then(data => { setUser_id(data["user_id"]) })
   }
 
   return (
     <div className="box_form">
       <form action={login} className='login_form'>
-        <div>
-          <label for="username">username</label>
+        <div className="box_input">
+          <label for="username" className="user_detail">Username</label>
           <input name="username" type='text' />
         </div>
-        <div>
-          <label for="password" type='text'>password</label>
-          <input name="password" />
+        <div className="box_input">
+          <label for="password" className="user_detail">Password</label>
+          <input name="password" type='password' />
         </div>
-        <button type="submit"> Sign in</button>
+        <button type="submit" className="submit_btn"> Sign in</button>
       </form>
     </div>
   )

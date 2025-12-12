@@ -13,9 +13,9 @@ async def root():
 
 
 @app.get("/api/messages/")
-async def show_messages(userid: int):
+async def show_messages(groupid: int):
     connection = engine.connect()
-    return Message.showall_messages(userid, connection)
+    return Message.showall_messages(groupid, connection)
 
 
 @app.post("/api/messages")

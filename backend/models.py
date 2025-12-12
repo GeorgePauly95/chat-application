@@ -33,10 +33,10 @@ class Message(Base):
     replied_to: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("messages.id"))
 
     @classmethod
-    def showall_messages(cls, user_id, connection):
+    def showall_messages(cls, group_id, connection):
         messages = connection.execute(
-            text("SELECT * FROM messages WHERE sender_id=:user_id"),
-            {"user_id": user_id},
+            text("SELECT * FROM messages WHERE group_id=:group_id"),
+            {"group_id": group_id},
         )
         mapped_messages = [message._mapping for message in messages.all()]
         return mapped_messages
