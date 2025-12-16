@@ -14,7 +14,7 @@ body {
 .box_inner {
   display: flex;
   flex-direction: column;
-  width: calc(100% - 200px);
+  width: calc(100% - 400px);
 }
 
 
@@ -25,24 +25,23 @@ body {
   align-items: flex-start;
   row-gap: 20px;
   overflow: auto;
-  padding-left: 30px;
-  padding-right: 30px;
+  padding-inline: 30px;
   padding-bottom: 10px;
 }
 
 .msgl {
-  background-color: whitesmoke;
   align-self: flex-start;
-  border-radius: 5px;
-  padding: 5px;
 }
 
 
 .msgr {
-  background-color: whitesmoke;
   align-self: flex-end;
-  border-radius: 5px;
-  padding: 5px;
+}
+
+.msg {
+  background-color: whitesmoke;
+  border-radius: 10px;
+  padding: 10px;
 }
 
 .form {
