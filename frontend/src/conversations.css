@@ -1,8 +1,40 @@
+.side_panel {
+  display: flex;
+  flex-direction: column;
+  background-color: darkseagreen;
+  width: 400px;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+  justify-content: space-between;
+  font-size: large;
+  font-weight: 800;
+  color: white;
+}
+
+.add_group {
+  border-style: solid;
+  border-color: whitesmoke;
+  padding-inline: 10px;
+  border-top-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.add_group_btn {
+  background-color: darkseagreen;
+  border-style: none;
+  font-size: large;
+  font-weight: 800;
+  color: white;
+}
+
 .box_conv {
   display: flex;
   flex-direction: column;
-  width: 200px;
-  background-color: darkseagreen;
   padding: 10px;
   row-gap: 10px;
   overflow: auto;
