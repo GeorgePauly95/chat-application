@@ -1,14 +1,10 @@
 
-function isEmptyMessage(message) {
-  console.log(message)
-  message = message.replaceAll(" ", "");
-  console.log(message)
-  message = message.replaceAll("\n", "");
-  console.log(message)
-  if (message == "") {
+function isEmpty(text) {
+  const cleaned_text = text.trim();
+  if (cleaned_text == "") {
     return true
   }
   return false
 }
 
-export default isEmptyMessage
+export default isEmpty
