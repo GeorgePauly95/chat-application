@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react'
-import Conversations from './conversations.jsx'
-import isEmptyMessage from './utils.js'
+import SidePanel from './sidepanel.jsx'
+import isEmpty from './utils.js'
 import './App.css'
 
 function App({ user_id }) {
-  const [group_id, setGroup_id] = useState(1)
+  const [group_id,] = useState(1)
   return (
     <div className="box_outer">
-      <Conversations user_id={user_id} />
-      <TextInput user_id={user_id} group_id={group_id} setGroup_id={setGroup_id} />
+      <SidePanel user_id={user_id} />
+      <TextInput user_id={user_id} group_id={group_id} />
     </div>
   )
 }
 
-function TextInput({ user_id, group_id, setGroup_id }) {
+function TextInput({ user_id, group_id }) {
   const [msgHst, setMsghst] = useState([{ "content": "" }])
 
   useEffect(() => {
@@ -25,7 +25,7 @@ function TextInput({ user_id, group_id, setGroup_id }) {
 
   function sendMessage(e) {
     var current_message = e.get("currmsg")
-    if (isEmptyMessage(current_message)) {
+    if (isEmpty(current_message)) {
       return
     }
     fetch("/api/messages", {
@@ -70,7 +70,11 @@ function MessageHistory({ msgHst, user_id }) {
 
 function MessageBlob({ message, user_id }) {
   return (
-    <div className={message["sender_id"] == user_id ? "msgr" : "msgl"}>{message["content"]}</div>
+    <div className={message["sender_id"] == user_id ? "msgr" : "msgl"}>
+      <div className='msg'>
+        {message["content"]}
+      </div>
+    </div>
   )
 }
 
