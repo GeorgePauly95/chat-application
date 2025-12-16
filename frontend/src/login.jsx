@@ -36,7 +36,7 @@ function Login({ setUser_id }) {
           <label for="password" className="user_detail">Password</label>
           <input name="password" type='password' />
         </div>
-        <button type="submit" className="submit_btn"> Sign in</button>
+        <button type="submit" className="submit_btn">Sign&nbsp;in</button>
       </form>
     </div>
   )
