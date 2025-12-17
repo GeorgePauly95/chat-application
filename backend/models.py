@@ -1,10 +1,20 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import text, String, Text, Enum as SQLEnum, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
+from services import is_empty
+from engine import engine
 from typing import Optional
 from datetime import datetime
 import uuid
 import enum
+
+
+def manage_connection(model_function):
+    def inner(cls, *args, **kwargs):
+        with engine.begin() as connection:
+            return model_function(cls, connection, *args, **kwargs)
+
+    return inner
 
 
 class Base(DeclarativeBase):
@@ -33,7 +43,8 @@ class Message(Base):
     replied_to: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("messages.id"))
 
     @classmethod
-    def showall_messages(cls, group_id, connection):
+    @manage_connection
+    def showall_messages(cls, connection, group_id):
         messages = connection.execute(
             text("SELECT * FROM messages WHERE group_id=:group_id"),
             {"group_id": group_id},
@@ -42,7 +53,10 @@ class Message(Base):
         return mapped_messages
 
     @classmethod
-    def add_message(cls, request_body, connection):
+    @manage_connection
+    def add_message(cls, connection, request_body):
+        if is_empty(request_body["content"]):
+            return None
         message = connection.execute(
             text(
                 """INSERT INTO messages
@@ -57,7 +71,6 @@ class Message(Base):
         )
         sent_message = message.first()
         mapped_message = sent_message._mapping
-        connection.commit()
         return mapped_message
 
 
@@ -82,13 +95,20 @@ class UserAccount(Base):
     password: Mapped[str] = mapped_column(Text)
 
     @classmethod
-    def get_user_details(cls, username, connection):
+    @manage_connection
+    def get_user_details(cls, connection, username):
         user_accounts = connection.execute(
             text("SELECT * FROM user_accounts WHERE username=:username"),
             {"username": username},
         )
-        user_accounts = user_accounts.first()
-        return user_accounts
+        user_account = user_accounts.first()
+        if user_account is None:
+            return user_account
+        user_account_details = user_account._mapping
+        return {
+            "user_id": user_account_details["user_id"],
+            "username": user_account_details["username"],
+        }
 
 
 class Group(Base):
@@ -100,6 +120,7 @@ class Group(Base):
     deleted_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
 
     @classmethod
+    @manage_connection
     def showall_groups(cls, connection):
         messages = connection.execute(text("SELECT * FROM group_chats"))
         mapped_groups = [message._mapping for message in messages.all()]
@@ -137,5 +158,14 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50))
-    created_at: Mapped[datetime] = mapped_column(TIMESTAMP)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, server_default=text("NOW()")
+    )
     deleted_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
+
+    @classmethod
+    @manage_connection
+    def show_users(cls, connection):
+        users = connection.execute(text("SELECT * FROM users"))
+        mapped_users = [user._mapping for user in users]
+        return mapped_users
