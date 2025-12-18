@@ -1,14 +1,13 @@
 import { useState } from "react"
 import Conversations from "./conversations"
-import "./conversations.css"
+import Contacts from "./contacts"
+import "./sidepanel.css"
+import "./contacts.css"
+
 function SidePanel({ user_id }) {
-  const [contacts, setContacts] = useState(false)
+  const [contactsView, setContactsView] = useState(false)
   function handleAddGroups() {
-    fetch("/api/users")
-      .then(response => response.json())
-      .then(result => console.log(result))
-    setContacts(false);
-    alert("Contacts!")
+    setContactsView(true);
   }
 
   return (
@@ -21,16 +20,11 @@ function SidePanel({ user_id }) {
           <button type="button" className="add_group_btn" onClick={handleAddGroups}>+</button>
         </div>
       </div>
-      {!contacts ? <Conversations user_id={user_id} /> : <Contacts users={users} />}
+      {!contactsView ? <Conversations user_id={user_id} /> :
+        <Contacts user_id={user_id} contactsView={contactsView} setContactsView={setContactsView} />}
     </div>
   )
 }
 
-function Contacts({ users }) {
-  return (
-    <div>
 
-    </div>
-  )
-}
 export default SidePanel
