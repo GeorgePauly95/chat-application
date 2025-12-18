@@ -1,0 +1,46 @@
+.box_contacts {
+  display: flex;
+  flex-direction: column;
+  row-gap: 30px;
+  flex-grow: 1;
+  border-style: none;
+  background-color: forestgreen;
+  border-radius: 10px;
+  margin: 10px;
+  padding: 10px;
+}
+
+.create_group {
+  align-self: center;
+}
+
+.close_contacts {
+  align-self: flex-end;
+}
+
+.box_group {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  row-gap: 10px;
+  flex-grow: 1;
+}
+
+.box_groupname {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.list_contact {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  flex-grow: 1;
+}
+
+.contact {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
