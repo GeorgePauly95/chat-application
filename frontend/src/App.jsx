@@ -64,7 +64,7 @@ function TextInput({ user_id, group_id }) {
 
 function MessageHistory({ msgHst, user_id }) {
   return (<div className='msgHst'>
-    {msgHst.map(message => <MessageBlob message={message} user_id={user_id} />)}
+    {msgHst.map((message, index) => <MessageBlob key={index} message={message} user_id={user_id} />)}
   </div>)
 }
 
