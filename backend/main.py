@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
-from engine import engine
 from models import Message, Group, UserAccount, User
 
 app = FastAPI()
@@ -30,6 +29,14 @@ async def show_groups():
     return Group.showall_groups()
 
 
+@app.post("/api/groups")
+async def create_group(request: Request):
+    request_body = await request.json()
+    print(request_body)
+    Group.add_group(request_body)
+    return "GROUP CREATED!"
+
+
 @app.post("/api/login")
 async def login(request: Request):
     request_body = await request.json()
@@ -38,11 +45,11 @@ async def login(request: Request):
     if user_details is None:
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"message": "Unauthorized"},
+            content={},
         )
     return user_details
 
 
-@app.get("/api/users")
-async def show_users():
-    return User.show_users()
+@app.get("/api/users/{user_id}")
+async def show_users(user_id):
+    return User.show_users(user_id)
