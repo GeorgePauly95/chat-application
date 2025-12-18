@@ -116,7 +116,9 @@ class Group(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50))
-    created_at: Mapped[datetime] = mapped_column(TIMESTAMP)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, server_default=text("NOW()")
+    )
     deleted_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
 
     @classmethod
@@ -125,6 +127,19 @@ class Group(Base):
         messages = connection.execute(text("SELECT * FROM group_chats"))
         mapped_groups = [message._mapping for message in messages.all()]
         return mapped_groups
+
+    @classmethod
+    @manage_connection
+    def add_group(cls, connection, request_body):
+        group_details = connection.execute(
+            text("INSERT INTO group_chats(name) VALUES(:name) RETURNING *"),
+            {"name": request_body["name"]},
+        ).first()
+        group_details = dict(group_details._mapping)
+        group_details["admin"] = request_body["admin"]
+        group_details["members"] = request_body["members"]
+        print(f"group result:{group_details}")
+        GroupMember.add_groupmembers(connection, group_details)
 
 
 class GroupMember(Base):
@@ -136,8 +151,33 @@ class GroupMember(Base):
     role: Mapped[GroupMemberRole] = mapped_column(
         SQLEnum(GroupMemberRole, name="groupmemberrole")
     )
-    joined_at: Mapped[datetime] = mapped_column(TIMESTAMP)
+    joined_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=text("NOW()"))
     left_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
+
+    @classmethod
+    def add_groupmembers(cls, connection, group_details):
+        members = group_details["members"]
+        admin = group_details["admin"]
+        group_id = group_details["id"]
+        connection.execute(
+            text("""INSERT INTO group_members(user_id, group_id, role)
+            VALUES(:user_id, :group_id, :role)"""),
+            {
+                "user_id": admin,
+                "group_id": group_id,
+                "role": GroupMemberRole.ADMIN,
+            },
+        )
+        for member in members:
+            connection.execute(
+                text("""INSERT INTO group_members(user_id, group_id, role)
+                VALUES(:user_id, :group_id, :role)"""),
+                {
+                    "user_id": member,
+                    "group_id": group_id,
+                    "role": GroupMemberRole.MEMBER,
+                },
+            )
 
 
 class Session(Base):
@@ -165,7 +205,9 @@ class User(Base):
 
     @classmethod
     @manage_connection
-    def show_users(cls, connection):
-        users = connection.execute(text("SELECT * FROM users"))
+    def show_users(cls, connection, user_id):
+        users = connection.execute(
+            text("SELECT * FROM users WHERE id!=:user_id"), {"user_id": user_id}
+        )
         mapped_users = [user._mapping for user in users]
         return mapped_users
