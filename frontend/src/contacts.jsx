@@ -10,9 +10,6 @@ function Contacts({ user_id, contactsView, setContactsView }) {
   }, [user_id])
 
   function createNewGroup(formData) {
-    console.log("group name is: ", formData.get("groupname"))
-    console.log("member ids are: ", formData.getAll("contact"))
-    console.log("admin id is: ", user_id)
     fetch("/api/groups", {
       "method": "POST",
       "body": JSON.stringify({
@@ -34,7 +31,7 @@ function Contacts({ user_id, contactsView, setContactsView }) {
           <input type="text" name="groupname" />
         </div>
         <div className="list_contact">
-          {contacts.map(contact => <Contact contact={contact} user_id={user_id} />)}
+          {contacts.map(contact => <Contact key={contact["id"]} contact={contact} user_id={user_id} />)}
         </div>
       </form>
     </div>

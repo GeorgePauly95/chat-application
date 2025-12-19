@@ -8,7 +8,7 @@ function Conversations() {
   }, [])
   return (
     <div className='box_conv'>
-      {convs.map((conv, index) => <Conversation key={index} conv={conv["name"]} />)}
+      {convs.map(conv => <Conversation key={conv.id} conv={conv["name"]} />)}
     </div >
   )
 }
