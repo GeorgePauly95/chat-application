@@ -4,11 +4,11 @@ import isEmpty from './utils.js'
 import './App.css'
 
 function App({ user_id }) {
-  const [group_id,] = useState(1)
+  const [group_id, setGroup_id] = useState(5)
   return (
     <div className="box_outer">
-      <SidePanel user_id={user_id} />
-      <TextInput user_id={user_id} group_id={group_id} />
+      <SidePanel user_id={user_id} group_id={group_id} setGroup_id={setGroup_id} />
+      <TextInput user_id={user_id} group_id={group_id} setGroup_id={setGroup_id} />
     </div>
   )
 }
@@ -70,10 +70,8 @@ function MessageHistory({ msgHst, user_id }) {
 
 function MessageBlob({ message, user_id }) {
   return (
-    <div className={message["sender_id"] == user_id ? "msgr" : "msgl"}>
-      <div className='msg'>
-        {message["content"]}
-      </div>
+    <div className={"msg " + (message["sender_id"] == user_id ? "msgr" : "msgl")}>
+      {message["content"]}
     </div>
   )
 }
