@@ -24,15 +24,15 @@ async def send_message(request: Request):
     return response
 
 
-@app.get("/api/groups")
-async def show_groups():
-    return Group.showall_groups()
+@app.get("/api/groups/")
+async def show_groups(user_id: int):
+    groups = Group.showall_groups(user_id)
+    return groups
 
 
 @app.post("/api/groups")
 async def create_group(request: Request):
     request_body = await request.json()
-    print(request_body)
     Group.add_group(request_body)
     return "GROUP CREATED!"
 
