@@ -9,6 +9,7 @@ import uuid
 import enum
 
 
+# do a conditional check on connection for None so that functions like add_group_members can be called independently. make it a kwarg.
 def manage_connection(model_function):
     def inner(cls, *args, **kwargs):
         with engine.begin() as connection:
@@ -21,6 +22,7 @@ class Base(DeclarativeBase):
     pass
 
 
+# str ENUM
 class GroupMemberRole(enum.Enum):
     ADMIN = "admin"
     MEMBER = "member"
@@ -54,6 +56,7 @@ class Message(Base):
 
     @classmethod
     @manage_connection
+    # change "request_body" to "message"
     def add_message(cls, connection, request_body):
         if is_empty(request_body["content"]):
             return None
@@ -123,10 +126,20 @@ class Group(Base):
 
     @classmethod
     @manage_connection
-    def showall_groups(cls, connection):
-        messages = connection.execute(text("SELECT * FROM group_chats"))
-        mapped_groups = [message._mapping for message in messages.all()]
-        return mapped_groups
+    def showall_groups(cls, connection, user_id):
+        group_ids = connection.execute(
+            text("SELECT group_id FROM group_members WHERE user_id=:user_id"),
+            {"user_id": user_id},
+        )
+        group_ids = [group_id._mapping["group_id"] for group_id in group_ids]
+
+        groups = connection.execute(
+            text("SELECT * FROM group_chats WHERE id = ANY(:group_ids)"),
+            {"group_ids": group_ids},
+        )
+
+        groups = [group._mapping for group in groups.all()]
+        return groups
 
     @classmethod
     @manage_connection
@@ -138,7 +151,6 @@ class Group(Base):
         group_details = dict(group_details._mapping)
         group_details["admin"] = request_body["admin"]
         group_details["members"] = request_body["members"]
-        print(f"group result:{group_details}")
         GroupMember.add_groupmembers(connection, group_details)
 
 
@@ -154,11 +166,13 @@ class GroupMember(Base):
     joined_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=text("NOW()"))
     left_at: Mapped[Optional[datetime]] = mapped_column(TIMESTAMP)
 
+    # make this a part of add_group method itself.
     @classmethod
     def add_groupmembers(cls, connection, group_details):
         members = group_details["members"]
         admin = group_details["admin"]
         group_id = group_details["id"]
+        # combine this query with the one below
         connection.execute(
             text("""INSERT INTO group_members(user_id, group_id, role)
             VALUES(:user_id, :group_id, :role)"""),
@@ -168,6 +182,7 @@ class GroupMember(Base):
                 "role": GroupMemberRole.ADMIN,
             },
         )
+        # use an array to insert values instead of a for loop
         for member in members:
             connection.execute(
                 text("""INSERT INTO group_members(user_id, group_id, role)
