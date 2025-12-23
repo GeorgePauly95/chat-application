@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request, status, WebSocket
 from fastapi.responses import JSONResponse
 from models import Message, Group, UserAccount, User
 
@@ -8,6 +8,15 @@ app = FastAPI()
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+
+@app.websocket("/api/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        print(f"data is: {data}")
+        await websocket.send_text(data)
 
 
 @app.get("/api/messages/")
