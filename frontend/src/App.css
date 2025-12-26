@@ -17,6 +17,9 @@ body {
   width: calc(100% - 400px);
 }
 
+.loading {
+  font-size: xx-large;
+}
 
 .msgHst {
   display: flex;
