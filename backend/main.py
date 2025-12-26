@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, status, WebSocket
 from fastapi.responses import JSONResponse
 from models import Message, Group, UserAccount, User
+import json
 
 app = FastAPI()
 
@@ -10,27 +11,22 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.websocket("/api/ws")
+@app.websocket("/api/messages")
 async def websocket_endpoint(websocket: WebSocket):
+    group_id = websocket.query_params.get("group_id")
     await websocket.accept()
     while True:
-        data = await websocket.receive_text()
-        print(f"data is: {data}")
-        await websocket.send_text(data)
+        text_data = await websocket.receive_text()
+        data = json.loads(text_data)
+        Message.add_message(data)
+        await websocket.send_text(json.dumps(Message.showall_messages(group_id)))
 
 
-@app.get("/api/messages/")
-async def show_messages(groupid: int):
-    return Message.showall_messages(groupid)
-
-
-@app.post("/api/messages")
-async def send_message(request: Request):
-    request_body = await request.json()
-    response = Message.add_message(request_body)
-    if response is None:
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={})
-    return response
+# @app.get("/api/messages")
+# async def show_messages_by_user(user_id: int):
+#     # groups = Group.showall_groups(user_id)
+#
+#     return
 
 
 @app.get("/api/groups/")
