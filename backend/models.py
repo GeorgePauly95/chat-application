@@ -51,7 +51,7 @@ class Message(Base):
             text("SELECT * FROM messages WHERE group_id=:group_id"),
             {"group_id": group_id},
         )
-        mapped_messages = [message._mapping for message in messages.all()]
+        mapped_messages = [dict(message._mapping) for message in messages.all()]
         return mapped_messages
 
     @classmethod
@@ -138,7 +138,26 @@ class Group(Base):
             {"group_ids": group_ids},
         )
 
-        groups = [group._mapping for group in groups.all()]
+        groups = [dict(group._mapping) for group in groups.all()]
+
+        def add_message_key(group):
+            group["messages"] = []
+            return group
+
+        groups = list(map(add_message_key, groups))
+
+        group_ids = [group["id"] for group in groups]
+        messages = connection.execute(
+            text("SELECT * FROM messages WHERE group_id = ANY(:group_ids)"),
+            {"group_ids": group_ids},
+        )
+        messages = [dict(message._mapping) for message in messages.all()]
+        print(f"Messages are: {messages}\nGroups are: {groups}")
+        for message in messages:
+            group_id = message["group_id"]
+            for group in groups:
+                if group_id == group["id"]:
+                    group["messages"].append(message)
         return groups
 
     @classmethod
