@@ -73,7 +73,7 @@ class Message(Base):
             },
         )
         sent_message = message.first()
-        mapped_message = sent_message._mapping
+        mapped_message = dict(sent_message._mapping)
         return mapped_message
 
 
@@ -152,7 +152,6 @@ class Group(Base):
             {"group_ids": group_ids},
         )
         messages = [dict(message._mapping) for message in messages.all()]
-        print(f"Messages are: {messages}\nGroups are: {groups}")
         for message in messages:
             group_id = message["group_id"]
             for group in groups:

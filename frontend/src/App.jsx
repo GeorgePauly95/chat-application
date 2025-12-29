@@ -4,8 +4,11 @@ import isEmpty from './utils.js'
 import './App.css'
 
 function App({ user_id }) {
+
   const [convs, setConvs] = useState([])
   const [currentGroup_id, setCurrentGroup_id] = useState()
+  const [ws, setWs] = useState(() => new WebSocket("ws://localhost:5173/api/messages"))
+
 
   useEffect(() => {
 
@@ -15,26 +18,46 @@ function App({ user_id }) {
         setConvs(conversations);
       })
   }, [user_id])
+
   return (
     <div className="box_outer">
       <SidePanel user_id={user_id} convs={convs} currentGroup_id={currentGroup_id} setCurrentGroup_id={setCurrentGroup_id} />
-      <MainPanel user_id={user_id} convs={convs} currentGroup_id={currentGroup_id} />
+      <MainPanel user_id={user_id} convs={convs} currentGroup_id={currentGroup_id} ws={ws} />
     </div>
   )
 }
 
-function MainPanel({ user_id, convs, currentGroup_id }) {
+function MainPanel({ user_id, convs, setConvs, currentGroup_id, ws }) {
   const currentGroup = convs.filter((conv) => conv["id"] === currentGroup_id)[0];
+
   if (!currentGroup) {
     return <div className='loading'>WhatsGapp</div>
   }
-  const messages = currentGroup.messages
+
+  var messages = currentGroup.messages
+  ws.addEventListener("message", (e) => {
+    messages = [...messages, e.data]
+  })
+
+
+
   function send_message(e) {
+
     var messageContent = e.get("currmsg")
+
     if (isEmpty(messageContent)) {
       return
     }
+
+    ws.send(JSON.stringify(
+      {
+        "sender_id": user_id,
+        "group_id": currentGroup_id,
+        "content": messageContent,
+      }
+    ))
   }
+
   return (
     <div className='box_inner'>
       {<MessageHistory messages={messages} user_id={user_id} />}
