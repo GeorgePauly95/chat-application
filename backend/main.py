@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, status, WebSocket
 from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from models import Message, Group, UserAccount, User
 import json
 
@@ -13,20 +14,13 @@ async def root():
 
 @app.websocket("/api/messages")
 async def websocket_endpoint(websocket: WebSocket):
-    group_id = websocket.query_params.get("group_id")
     await websocket.accept()
     while True:
         text_data = await websocket.receive_text()
         data = json.loads(text_data)
-        Message.add_message(data)
-        await websocket.send_text(json.dumps(Message.showall_messages(group_id)))
-
-
-# @app.get("/api/messages")
-# async def show_messages_by_user(user_id: int):
-#     # groups = Group.showall_groups(user_id)
-#
-#     return
+        message = dict(Message.add_message(data))
+        encoded_message = jsonable_encoder(message)
+        await websocket.send_json(encoded_message)
 
 
 @app.get("/api/groups/")
