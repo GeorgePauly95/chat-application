@@ -48,7 +48,7 @@ function MainPanel({ user_id, convs, setConvs, currentGroup_id, ws }) {
     if (isEmpty(messageContent)) {
       return
     }
-    setConvs(() => { convs.map((conv) => { currentGroup_id == conv.id ?}) })
+    // setConvs(() => { convs.map((conv) => { currentGroup_id == conv.id ?}) })
     ws.send(JSON.stringify(
       {
         "sender_id": user_id,
