@@ -37,6 +37,10 @@ function Login({ setUser_id }) {
           <input name="password" type='password' />
         </div>
         <button type="submit" className="submit_btn">Sign&nbsp;in</button>
+        <div className='sign_up'>
+          Still not a User?
+        </div>
+        <button type="submit" className="submit_btn">Sign&nbsp;up</button>
       </form>
     </div>
   )

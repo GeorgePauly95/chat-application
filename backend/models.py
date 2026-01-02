@@ -96,6 +96,7 @@ class UserAccount(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     username: Mapped[str] = mapped_column(String(25))
     password: Mapped[str] = mapped_column(Text)
+    salt: Mapped[str] = mapped_column(Text)
 
     @classmethod
     @manage_connection

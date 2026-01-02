@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, status, WebSocket
 from fastapi.responses import JSONResponse
 from models import Message, Group, UserAccount, User
+import bcrypt
 
 app = FastAPI()
 
@@ -57,6 +58,15 @@ async def login(request: Request):
             content={},
         )
     return user_details
+
+
+@app.post("/api/register")
+async def register(request: Request):
+    request_body = await request.json()
+    username, password = request_body["username"], request_body["password"]
+    hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+
+    return "Sign Up!"
 
 
 @app.get("/api/users/{user_id}")
