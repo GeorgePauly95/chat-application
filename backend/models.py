@@ -212,6 +212,19 @@ class GroupMember(Base):
                 },
             )
 
+    @classmethod
+    @manage_connection
+    def showall_groupmembers(cls, connection, group_id):
+        group_members = connection.execute(
+            text("SELECT * FROM group_members WHERE group_id=:group_id"),
+            {"group_id": group_id},
+        )
+        group_members = [
+            dict(group_member._mapping)["user_id"]
+            for group_member in group_members.all()
+        ]
+        return group_members
+
 
 class Session(Base):
     __tablename__ = "sessions"
