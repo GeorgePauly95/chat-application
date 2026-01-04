@@ -7,7 +7,7 @@ function App({ user_id }) {
 
   const [convs, setConvs] = useState([])
   const [currentGroup_id, setCurrentGroup_id] = useState()
-  const [ws, setWs] = useState(() => new WebSocket("ws://localhost:5173/api/messages"))
+  const [ws, setWs] = useState(() => new WebSocket(`ws://localhost:5173/api/ws/${user_id}`))
 
 
   useEffect(() => {
@@ -35,9 +35,9 @@ function MainPanel({ user_id, convs, setConvs, currentGroup_id, ws }) {
   }
 
   var messages = currentGroup.messages
-  ws.addEventListener("message", (e) => {
-    messages = [...messages, e.data]
-  })
+  // ws.addEventListener("message", (e) => {
+  //   messages = [...messages, e.data]
+  // })
 
 
 
