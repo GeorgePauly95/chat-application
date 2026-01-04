@@ -1,10 +1,14 @@
-from fastapi import FastAPI, Request, status, WebSocket
+from fastapi import FastAPI, Request, status, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from models import Message, Group, UserAccount, User
 import json
+from models import Message, Group, UserAccount, User, GroupMember
+from services import (
+    ConnectionManager,
+)
 
 app = FastAPI()
+connection_manager = ConnectionManager()
 
 
 @app.get("/")
@@ -12,15 +16,31 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.websocket("/api/messages")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        text_data = await websocket.receive_text()
-        data = json.loads(text_data)
-        message = dict(Message.add_message(data))
-        encoded_message = jsonable_encoder(message)
-        await websocket.send_json(encoded_message)
+@app.websocket("/api/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: int):
+    await connection_manager.create_connection(websocket, user_id)
+    try:
+        while True:
+            text_data = await websocket.receive_text()
+            data = json.loads(text_data)
+            message = Message.add_message(data)
+            group_id = message["group_id"]
+            encoded_message = jsonable_encoder(message)
+            group_member_ids = GroupMember.showall_groupmembers(group_id)
+            for group_member_id in group_member_ids:
+                if user_id == group_member_id:
+                    continue
+                else:
+                    member_connection = connection_manager.get_connection(
+                        group_member_id
+                    )
+                    if member_connection is None:
+                        continue
+                    await connection_manager.send_message(
+                        encoded_message, member_connection
+                    )
+    except WebSocketDisconnect:
+        connection_manager.remove_connection(user_id)
 
 
 @app.get("/api/groups/")
