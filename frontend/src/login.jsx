@@ -17,9 +17,13 @@ function Login({ setUser_id }) {
 
   function login(e) {
     var username = e.get("username")
+    var password = e.get("password")
     fetch("/api/login", {
       method: "POST",
-      body: JSON.stringify({ username: username })
+      body: JSON.stringify({
+        username: username,
+        password: password,
+      })
     })
       .then(response => response.json())
       .then(data => { setUser_id(data["user_id"]) })

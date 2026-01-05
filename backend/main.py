@@ -56,7 +56,20 @@ async def login(request: Request):
             status_code=status.HTTP_401_UNAUTHORIZED,
             content={},
         )
-    return user_details
+    else:
+        stored_password, salt = user_details["password"], user_details["salt"]
+        encoded_stored_password, encoded_salt = (
+            stored_password.encode("utf-8"),
+            salt.encode("utf-8"),
+        )
+        calc_password = bcrypt.hashpw(password.encode("utf-8"), encoded_salt)
+
+        if calc_password == encoded_stored_password:
+            return user_details
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={},
+        )
 
 
 @app.post("/api/register")

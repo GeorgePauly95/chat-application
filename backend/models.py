@@ -109,10 +109,7 @@ class UserAccount(Base):
         if user_account is None:
             return user_account
         user_account_details = user_account._mapping
-        return {
-            "user_id": user_account_details["user_id"],
-            "username": user_account_details["username"],
-        }
+        return user_account_details
 
     @classmethod
     @manage_connection
