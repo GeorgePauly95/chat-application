@@ -16,7 +16,6 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
         data = await websocket.receive_text()
-        print(f"data is: {data}")
         await websocket.send_text(data)
 
 
@@ -50,7 +49,7 @@ async def create_group(request: Request):
 @app.post("/api/login")
 async def login(request: Request):
     request_body = await request.json()
-    username = request_body["username"]
+    username, password = request_body["username"], request_body["password"]
     user_details = UserAccount.get_user_details(username)
     if user_details is None:
         return JSONResponse(
@@ -64,9 +63,19 @@ async def login(request: Request):
 async def register(request: Request):
     request_body = await request.json()
     username, password = request_body["username"], request_body["password"]
-    hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-
-    return "Sign Up!"
+    created_user = User.add_user(username)
+    user_id = created_user["id"]
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
+    decoded_hashed_password, decoded_salt = (
+        hashed_password.decode("utf-8"),
+        salt.decode("utf-8"),
+    )
+    user_details = UserAccount.register_user(
+        user_id, username, decoded_hashed_password, decoded_salt
+    ).first()
+    user_details = user_details._mapping
+    return user_details
 
 
 @app.get("/api/users/{user_id}")

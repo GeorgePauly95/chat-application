@@ -25,6 +25,20 @@ function Login({ setUser_id }) {
       .then(data => { setUser_id(data["user_id"]) })
   }
 
+  function register(e) {
+    var username = e.get("username")
+    var password = e.get("password")
+    fetch("/api/register", {
+      method: "POST",
+      body: JSON.stringify({
+        username: username,
+        password: password
+      })
+    })
+      .then(response => response.json())
+      .then(data => { console.log(data); setUser_id(data["user_id"]) })
+  }
+
   return (
     <div className="box_form">
       <form action={login} className='login_form'>
@@ -40,7 +54,7 @@ function Login({ setUser_id }) {
         <div className='sign_up'>
           Still not a User?
         </div>
-        <button type="submit" className="submit_btn">Sign&nbsp;up</button>
+        <button type="submit" formAction={register} className="submit_btn">Sign&nbsp;up</button>
       </form>
     </div>
   )

@@ -114,6 +114,23 @@ class UserAccount(Base):
             "username": user_account_details["username"],
         }
 
+    @classmethod
+    @manage_connection
+    def register_user(cls, connection, user_id, username, password, salt):
+        account_type = "normal"
+        user_details = connection.execute(
+            text("""INSERT INTO user_accounts(account_type, user_id, username, password, salt)
+            VALUES(:account_type, :user_id, :username, :password, :salt) RETURNING *"""),
+            {
+                "account_type": account_type,
+                "user_id": user_id,
+                "username": username,
+                "password": password,
+                "salt": salt,
+            },
+        )
+        return user_details
+
 
 class Group(Base):
     __tablename__ = "group_chats"
@@ -227,3 +244,13 @@ class User(Base):
         )
         mapped_users = [user._mapping for user in users]
         return mapped_users
+
+    @classmethod
+    @manage_connection
+    def add_user(cls, connection, username):
+        created_user = connection.execute(
+            text("INSERT INTO users(name) VALUES(:name) RETURNING *"),
+            {"name": username},
+        ).first()
+        created_user = created_user._mapping
+        return created_user
