@@ -2,7 +2,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import text, String, Text, Enum as SQLEnum, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
 from services import is_empty
-from engine import engine
+from engine import engine,
 from typing import Optional
 from datetime import datetime
 import uuid

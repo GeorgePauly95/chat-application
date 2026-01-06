@@ -1,9 +1,13 @@
-from fastapi import FastAPI, Request, status, WebSocket
+from fastapi import Depends, FastAPI, Request, status, WebSocket
 from fastapi.responses import JSONResponse
 from models import Message, Group, UserAccount, User
 import bcrypt
 
 app = FastAPI()
+
+
+async def session_authentication():
+    return
 
 
 @app.get("/")
