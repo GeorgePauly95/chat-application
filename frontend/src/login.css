@@ -26,6 +26,12 @@
 
 }
 
+.sign_up {
+  color: white;
+  font-size: x-large;
+  font-weight: 600;
+}
+
 .submit_btn {
   padding: 10px;
 }
