@@ -1,10 +1,26 @@
 import './login.css'
 import App from './App.jsx'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 
 function Start() {
   const [user_id, setUser_id] = useState(null)
+
+
+  useEffect(() => {
+    fetch("/api/me")
+      .then(response => {
+        if (response.ok) {
+          return response.json()
+        }
+        return null
+      })
+      .then(user_data => {
+        if (user_data) {
+          setUser_id(user_data["user_id"])
+        }
+      })
+  })
   return (
     <div>
       {user_id != null ? <App user_id={user_id} /> : <Login setUser_id={setUser_id} />}

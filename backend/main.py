@@ -1,18 +1,18 @@
-from fastapi import Depends, FastAPI, Request, status, WebSocket
+from typing import Annotated
+from fastapi import Depends, FastAPI, Request, Response, status, WebSocket
 from fastapi.responses import JSONResponse
 from models import Message, Group, UserAccount, User
+from sessions import create_session, validate_session, get_session_id
+from engine import redis_conn
 import bcrypt
 
 app = FastAPI()
 
 
-async def session_authentication():
-    return
-
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+@app.get("/api/me")
+async def check_session(request: Request):
+    session_data = validate_session(request, redis_conn)
+    return session_data
 
 
 @app.websocket("/api/ws")
