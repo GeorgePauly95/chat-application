@@ -4,7 +4,7 @@ import Contacts from "./contacts"
 import "./sidepanel.css"
 import "./contacts.css"
 
-function SidePanel({ user_id, setGroup_id }) {
+function SidePanel({ user_id, convs, setCurrentGroup_id }) {
   const [contactsView, setContactsView] = useState(false)
   function handleAddGroups() {
     setContactsView(true);
@@ -20,7 +20,7 @@ function SidePanel({ user_id, setGroup_id }) {
           <button type="button" className="add_group_btn" onClick={handleAddGroups}>+</button>
         </div>
       </div>
-      {!contactsView ? <Conversations user_id={user_id} setGroup_id={setGroup_id} /> :
+      {!contactsView ? <Conversations user_id={user_id} convs={convs} setCurrentGroup_id={setCurrentGroup_id} /> :
         <Contacts user_id={user_id} contactsView={contactsView} setContactsView={setContactsView} />}
     </div>
   )

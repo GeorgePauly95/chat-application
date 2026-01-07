@@ -1,8 +1,11 @@
-from fastapi import FastAPI, Request, status, WebSocket
+from fastapi import FastAPI, Request, status, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
-from models import Message, Group, UserAccount, User
+import json
+from models import Group, UserAccount, User
+from services import ConnectionManager
 
 app = FastAPI()
+connection_manager = ConnectionManager()
 
 
 @app.get("/")
@@ -10,27 +13,16 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.websocket("/api/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        print(f"data is: {data}")
-        await websocket.send_text(data)
-
-
-@app.get("/api/messages/")
-async def show_messages(groupid: int):
-    return Message.showall_messages(groupid)
-
-
-@app.post("/api/messages")
-async def send_message(request: Request):
-    request_body = await request.json()
-    response = Message.add_message(request_body)
-    if response is None:
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={})
-    return response
+@app.websocket("/api/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: int):
+    await connection_manager.create_connection(websocket, user_id)
+    try:
+        while True:
+            text_data = await websocket.receive_text()
+            data = json.loads(text_data)
+            await connection_manager.broadcast_message_to_group(user_id, data)
+    except WebSocketDisconnect:
+        connection_manager.remove_connection(user_id)
 
 
 @app.get("/api/groups/")

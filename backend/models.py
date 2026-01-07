@@ -1,7 +1,7 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import text, String, Text, Enum as SQLEnum, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
-from services import is_empty
+from utils import is_empty
 from engine import engine
 from typing import Optional
 from datetime import datetime
@@ -51,7 +51,7 @@ class Message(Base):
             text("SELECT * FROM messages WHERE group_id=:group_id"),
             {"group_id": group_id},
         )
-        mapped_messages = [message._mapping for message in messages.all()]
+        mapped_messages = [dict(message._mapping) for message in messages.all()]
         return mapped_messages
 
     @classmethod
@@ -73,7 +73,7 @@ class Message(Base):
             },
         )
         sent_message = message.first()
-        mapped_message = sent_message._mapping
+        mapped_message = dict(sent_message._mapping)
         return mapped_message
 
 
@@ -138,7 +138,25 @@ class Group(Base):
             {"group_ids": group_ids},
         )
 
-        groups = [group._mapping for group in groups.all()]
+        groups = [dict(group._mapping) for group in groups.all()]
+
+        def add_message_key(group):
+            group["messages"] = []
+            return group
+
+        groups = list(map(add_message_key, groups))
+
+        group_ids = [group["id"] for group in groups]
+        messages = connection.execute(
+            text("SELECT * FROM messages WHERE group_id = ANY(:group_ids)"),
+            {"group_ids": group_ids},
+        )
+        messages = [dict(message._mapping) for message in messages.all()]
+        for message in messages:
+            group_id = message["group_id"]
+            for group in groups:
+                if group_id == group["id"]:
+                    group["messages"].append(message)
         return groups
 
     @classmethod
@@ -193,6 +211,19 @@ class GroupMember(Base):
                     "role": GroupMemberRole.MEMBER,
                 },
             )
+
+    @classmethod
+    @manage_connection
+    def showall_groupmembers(cls, connection, group_id):
+        group_members = connection.execute(
+            text("SELECT * FROM group_members WHERE group_id=:group_id"),
+            {"group_id": group_id},
+        )
+        group_members = [
+            dict(group_member._mapping)["user_id"]
+            for group_member in group_members.all()
+        ]
+        return group_members
 
 
 class Session(Base):

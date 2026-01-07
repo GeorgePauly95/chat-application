@@ -4,57 +4,64 @@ import isEmpty from './utils.js'
 import './App.css'
 
 function App({ user_id }) {
-  const [group_id, setGroup_id] = useState(5)
+
+  const [convs, setConvs] = useState([])
+  const [currentGroup_id, setCurrentGroup_id] = useState()
+  const [ws, setWs] = useState(() => new WebSocket(`ws://localhost:5173/api/ws/${user_id}`))
+
+
+  useEffect(() => {
+
+    fetch(`/api/groups/?user_id=${user_id}`)
+      .then(response => response.json())
+      .then(conversations => {
+        setConvs(conversations);
+      })
+  }, [user_id])
+
   return (
     <div className="box_outer">
-      <SidePanel user_id={user_id} group_id={group_id} setGroup_id={setGroup_id} />
-      <TextInput user_id={user_id} group_id={group_id} setGroup_id={setGroup_id} />
+      <SidePanel user_id={user_id} convs={convs} currentGroup_id={currentGroup_id} setCurrentGroup_id={setCurrentGroup_id} />
+      <MainPanel user_id={user_id} convs={convs} currentGroup_id={currentGroup_id} ws={ws} />
     </div>
   )
 }
 
-function TextInput({ user_id, group_id }) {
-  const [msgHst, setMsghst] = useState([{ "content": "" }])
+function MainPanel({ user_id, convs, setConvs, currentGroup_id, ws }) {
+  const currentGroup = convs.filter((conv) => conv["id"] === currentGroup_id)[0];
 
-  useEffect(() => {
-    fetch(`/api/messages/?groupid=${group_id}`).then(response => response.json())
-      .then(data => {
-        setMsghst(data)
-      })
-  }, [group_id])
-
-  function sendMessage(e) {
-    var current_message = e.get("currmsg")
-    if (isEmpty(current_message)) {
-      return
-    }
-    fetch("/api/messages", {
-      method: "POST",
-      body: JSON.stringify({
-        "sender_id": user_id,
-        "group_id": group_id,
-        "content": current_message,
-      })
-    })
-      .then(response => {
-        if (response.ok) {
-          setMsghst([...msgHst, {
-            "sender_id": user_id,
-            "group_id": group_id,
-            "content": current_message,
-          }])
-          return response.json()
-        }
-        return "Message Failed"
-      })
-      .then(data => console.log(data))
+  if (!currentGroup) {
+    return <div className='loading'>WhatsGapp</div>
   }
 
+  var messages = currentGroup.messages
+  // ws.addEventListener("message", (e) => {
+  //   messages = [...messages, e.data]
+  // })
+
+
+
+  function send_message(e) {
+
+    var messageContent = e.get("currmsg")
+
+    if (isEmpty(messageContent)) {
+      return
+    }
+    // setConvs(() => { convs.map((conv) => { currentGroup_id == conv.id ?}) })
+    ws.send(JSON.stringify(
+      {
+        "sender_id": user_id,
+        "group_id": currentGroup_id,
+        "content": messageContent,
+      }
+    ))
+  }
 
   return (
     <div className='box_inner'>
-      {<MessageHistory msgHst={msgHst} user_id={user_id} />}
-      <form action={sendMessage} className='form'>
+      {<MessageHistory messages={messages} user_id={user_id} />}
+      <form action={send_message} className='form'>
         <textarea name="currmsg" type="text" className="currmsg" placeholder="enter message here" />
         <button type="submit" className="sendbtn">Send</button>
       </form>
@@ -62,9 +69,9 @@ function TextInput({ user_id, group_id }) {
   )
 }
 
-function MessageHistory({ msgHst, user_id }) {
+function MessageHistory({ messages, user_id }) {
   return (<div className='msgHst'>
-    {msgHst.map(message => <MessageBlob key={message["id"]} message={message} user_id={user_id} />)}
+    {messages.map(message => <MessageBlob key={message["id"]} message={message} user_id={user_id} />)}
   </div>)
 }
 
