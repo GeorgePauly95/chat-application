@@ -6,18 +6,14 @@ from engine import redis_conn
 import json
 
 
-def get_session_id(request: Request):
-    print(f"REQUEST IS: {request}")
-    return request.cookies.get("session_id")
-
-
 def create_session(redis_conn, user_id, response: Response):
     session_id = create_session_id()
-    expires_at = datetime.now() + timedelta(minutes=1)
-    session_data = {"user_id": user_id, "expires": expires_at.isoformat()}
+    expires_at = (datetime.now() + timedelta(days=10)).isoformat()
+    session_data = {"user_id": user_id, "expires": expires_at}
+    print(f"COOKIE EXPIRES AT: {expires_at}")
     redis_conn.set(session_id, json.dumps(session_data))
     response.set_cookie(
-        key="session_id", value=session_id, Httponly=True, Expires=expires_at
+        key="session_id", value=session_id, httponly=True, expires=expires_at
     )
     return session_id
 

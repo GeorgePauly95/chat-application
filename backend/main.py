@@ -1,8 +1,7 @@
-from typing import Annotated
-from fastapi import Depends, FastAPI, Request, Response, status, WebSocket
+from fastapi import FastAPI, Request, Response, status, WebSocket
 from fastapi.responses import JSONResponse
 from models import Message, Group, UserAccount, User
-from sessions import create_session, validate_session, get_session_id
+from sessions import create_session, validate_session
 from engine import redis_conn
 import bcrypt
 
@@ -51,7 +50,7 @@ async def create_group(request: Request):
 
 
 @app.post("/api/login")
-async def login(request: Request):
+async def login(request: Request, response: Response):
     request_body = await request.json()
     username, password = request_body["username"], request_body["password"]
     user_details = UserAccount.get_user_details(username)
@@ -69,6 +68,8 @@ async def login(request: Request):
         calc_password = bcrypt.hashpw(password.encode("utf-8"), encoded_salt)
 
         if calc_password == encoded_stored_password:
+            user_id = user_details["user_id"]
+            create_session(redis_conn, user_id, response)
             return user_details
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
