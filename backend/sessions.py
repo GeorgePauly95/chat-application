@@ -1,5 +1,4 @@
 from fastapi import Request, Response, status, HTTPException, Cookie
-from typing import Annotated
 from utils import create_session_id
 from datetime import datetime, timedelta
 from engine import redis_conn
@@ -10,7 +9,6 @@ def create_session(redis_conn, user_id, response: Response):
     session_id = create_session_id()
     expires_at = (datetime.now() + timedelta(days=10)).isoformat()
     session_data = {"user_id": user_id, "expires": expires_at}
-    print(f"COOKIE EXPIRES AT: {expires_at}")
     redis_conn.set(session_id, json.dumps(session_data))
     response.set_cookie(
         key="session_id", value=session_id, httponly=True, expires=expires_at
@@ -20,7 +18,6 @@ def create_session(redis_conn, user_id, response: Response):
 
 def validate_session(request: Request, redis_conn):
     session_id = request.cookies.get("session_id")
-    print(f"SESSION ID: {session_id}")
     if session_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Please Login"
