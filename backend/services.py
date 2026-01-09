@@ -29,10 +29,7 @@ class ConnectionManager:
         encoded_message = jsonable_encoder(message)
         member_ids = GroupMember.showall_groupmembers(group_id)
         for member_id in member_ids:
-            if sender_id == member_id:
+            member_connection = self.get_connection(member_id)
+            if member_connection is None:
                 continue
-            else:
-                member_connection = self.get_connection(member_id)
-                if member_connection is None:
-                    continue
-                await self.send_message(encoded_message, member_connection)
+            await self.send_message(encoded_message, member_connection)
