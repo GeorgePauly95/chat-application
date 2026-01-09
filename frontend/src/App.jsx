@@ -49,15 +49,6 @@ function App({ user_id }) {
   }, [ws, user_id])
 
 
-  return (
-    <div className="box_outer">
-      <SidePanel user_id={user_id} convs={convs} setCurrentGroup_id={setCurrentGroup_id} />
-      <MainPanel user_id={user_id} convs={convs} currentGroup_id={currentGroup_id} ws={ws} />
-    </div>
-  )
-}
-
-function MainPanel({ user_id, convs, currentGroup_id, ws }) {
   const currentGroup = convs.filter((conv) => conv["id"] === currentGroup_id)[0];
 
   if (!currentGroup) {
@@ -83,6 +74,17 @@ function MainPanel({ user_id, convs, currentGroup_id, ws }) {
       }
     ))
   }
+  return (
+    <div className="box_outer">
+      <SidePanel user_id={user_id} convs={convs} setCurrentGroup_id={setCurrentGroup_id} />
+      <MainPanel user_id={user_id} messages={messages} send_message={send_message} />
+    </div>
+  )
+}
+
+function MainPanel({ user_id, messages, send_message }) {
+
+
 
   return (
     <div className='box_inner'>
