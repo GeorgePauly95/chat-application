@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
 import './conversations.css'
 
-function Conversations({ user_id, convs, setCurrentGroup_id }) {
+function Conversations({ convs, setCurrentGroup_id }) {
 
+  console.log("Conversations are: ", convs)
 
   return (
     <div className='box_conv'>

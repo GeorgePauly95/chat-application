@@ -7,4 +7,7 @@ function isEmpty(text) {
   return false
 }
 
-export default isEmpty
+function handleMessage(e) {
+}
+
+export { isEmpty, handleMessage }

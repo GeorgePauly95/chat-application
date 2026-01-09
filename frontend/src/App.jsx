@@ -1,33 +1,63 @@
 import { useState, useEffect } from 'react'
 import SidePanel from './sidepanel.jsx'
-import isEmpty from './utils.js'
+import { isEmpty } from './utils.js'
 import './App.css'
 
 function App({ user_id }) {
 
-  const [convs, setConvs] = useState([])
+  const [convs, setConvs] = useState([{ id: null, messages: [] }])
   const [currentGroup_id, setCurrentGroup_id] = useState()
-  const [ws, setWs] = useState(() => new WebSocket(`ws://localhost:5173/api/ws/${user_id}`))
+  const [ws, setWs] = useState(null)
 
 
   useEffect(() => {
 
+    const websocket = new WebSocket(`ws://localhost:5173/api/ws/${user_id}`)
+    setWs(websocket)
+
+    return () => { websocket.close() }
+  }, [user_id])
+
+  useEffect(() => {
+    if (!ws) return
+
+    function handleMessage(e) {
+      var message = JSON.parse(e.data)
+      var group_id = message.group_id
+
+      setConvs((convs) => {
+        return convs.map((conv) => {
+          if (conv.id == group_id) {
+            return { ...conv, messages: [...conv.messages, message] }
+          }
+          return conv
+        })
+      })
+    }
+    ws.addEventListener("message", handleMessage)
+    return () => { ws.removeEventListener("message", handleMessage) }
+  }, [ws]
+  )
+
+
+  useEffect(() => {
     fetch(`/api/groups/?user_id=${user_id}`)
       .then(response => response.json())
       .then(conversations => {
         setConvs(conversations);
       })
-  }, [user_id])
+  }, [ws, user_id])
+
 
   return (
     <div className="box_outer">
-      <SidePanel user_id={user_id} convs={convs} currentGroup_id={currentGroup_id} setCurrentGroup_id={setCurrentGroup_id} />
+      <SidePanel user_id={user_id} convs={convs} setCurrentGroup_id={setCurrentGroup_id} />
       <MainPanel user_id={user_id} convs={convs} currentGroup_id={currentGroup_id} ws={ws} />
     </div>
   )
 }
 
-function MainPanel({ user_id, convs, setConvs, currentGroup_id, ws }) {
+function MainPanel({ user_id, convs, currentGroup_id, ws }) {
   const currentGroup = convs.filter((conv) => conv["id"] === currentGroup_id)[0];
 
   if (!currentGroup) {
@@ -35,9 +65,6 @@ function MainPanel({ user_id, convs, setConvs, currentGroup_id, ws }) {
   }
 
   var messages = currentGroup.messages
-  // ws.addEventListener("message", (e) => {
-  //   messages = [...messages, e.data]
-  // })
 
 
 
@@ -48,7 +75,6 @@ function MainPanel({ user_id, convs, setConvs, currentGroup_id, ws }) {
     if (isEmpty(messageContent)) {
       return
     }
-    // setConvs(() => { convs.map((conv) => { currentGroup_id == conv.id ?}) })
     ws.send(JSON.stringify(
       {
         "sender_id": user_id,

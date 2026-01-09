@@ -56,7 +56,7 @@ function Login({ setUser_id }) {
       })
     })
       .then(response => response.json())
-      .then(data => { console.log(data); setUser_id(data["user_id"]) })
+      .then(data => { setUser_id(data["user_id"]) })
   }
 
   return (
